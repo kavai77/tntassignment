@@ -40,7 +40,7 @@ curl "http://localhost:8081/aggregation?pricing=NL,CN&track=109347263,123456891&
 This was a major design decision. I was more familiar with the classic Java `ExecutorService` and `Future`s to implement concurrency.
 
 Project Reactive is well supported by Spring Boot:
-* `WebClient` is used to create non-blocking HTTP calls towards the APIs
+* `WebClient` is used to create non-blocking HTTP calls towards the APIs by returning a `Mono`
 * `Mono` in supported to be returned from `@RestController` methods
 
 Timeouts, aggregation, error handling and push notifications from Buffer was easier and cleaner to implement with Project Reactive.
