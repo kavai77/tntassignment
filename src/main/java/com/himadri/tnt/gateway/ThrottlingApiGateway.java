@@ -29,21 +29,21 @@ import java.util.concurrent.ConcurrentMap;
 public class ThrottlingApiGateway implements ApiGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThrottlingApiGateway.class);
 
-    private final DefaultApiGateway apiGateway;
+    private final DefaultApiGateway defaultApiGateway;
     private final int bufferSize;
     private final int bufferTimeoutInSec;
     private final long apiTimeoutInSec;
     private final ConcurrentMap<Class<?>, Buffer<?>> apiQueryBuffer = new ConcurrentHashMap<>();
 
-    private FluxSink<Long> schedulerBackPressure;
+    private FluxSink<Long> schedulerPushSink;
 
     public ThrottlingApiGateway(
-        DefaultApiGateway apiGateway,
+        DefaultApiGateway defaultApiGateway,
         @Value("${buffer.size}") int bufferSize,
         @Value("${buffer.timeout.in.sec}") int bufferTimeoutInSec,
         @Value("${api.timeout.in.sec}") long apiTimeoutInSec
     ) {
-        this.apiGateway = apiGateway;
+        this.defaultApiGateway = defaultApiGateway;
         this.bufferSize = bufferSize;
         this.bufferTimeoutInSec = bufferTimeoutInSec;
         this.apiTimeoutInSec = apiTimeoutInSec;
@@ -52,7 +52,7 @@ public class ThrottlingApiGateway implements ApiGateway {
     @PostConstruct
     public void scheduler() {
         Flux<Long> schedulerBackPressureMono = Flux.create(sink -> {
-            this.schedulerBackPressure = sink;
+            this.schedulerPushSink = sink;
         });
         Flux.interval(Duration.ofSeconds(1))
             .mergeWith(schedulerBackPressureMono)
@@ -91,7 +91,7 @@ public class ThrottlingApiGateway implements ApiGateway {
                     LOGGER.info("Buffering {}: {}. Buffer size: {} Sink size: {}",
                         apiGatewayClass.getSimpleName(), params.toString(), buffer.getParamList().size(), buffer.getSinks().size());
                     if (buffer.getParamList().size() >= bufferSize) {
-                        schedulerBackPressure.next(0L);
+                        schedulerPushSink.next(0L);
                     }
                 }
             })
@@ -108,7 +108,7 @@ public class ThrottlingApiGateway implements ApiGateway {
 
         public Mono<T> triggerQueryApi() {
             LOGGER.info("Triggering API query: {}", apiGatewayClass.getSimpleName());
-            return apiGateway.queryApi(apiGatewayClass, StringUtils.collectionToCommaDelimitedString(paramList))
+            return defaultApiGateway.queryApi(apiGatewayClass, StringUtils.collectionToCommaDelimitedString(paramList))
                 .doOnError(error -> {
                     sinks.forEach(it -> {
                         it.error(error);

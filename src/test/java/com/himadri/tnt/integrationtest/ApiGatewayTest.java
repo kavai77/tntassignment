@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@EnabledIfEnvironmentVariable(named = "integration-tests", matches = "enabled")
+@EnabledIfEnvironmentVariable(named = "INTEGRATIONTEST", matches = "enabled")
 class ApiGatewayTest {
 	@Autowired
 	private ApplicationContext applicationContext;

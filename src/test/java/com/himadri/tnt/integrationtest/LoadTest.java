@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-@EnabledIfEnvironmentVariable(named = "integration-tests", matches = "enabled")
+@EnabledIfEnvironmentVariable(named = "INTEGRATIONTEST", matches = "enabled")
 public class LoadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadTest.class);
 

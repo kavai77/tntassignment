@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
-@EnabledIfEnvironmentVariable(named = "integration-tests", matches = "enabled")
+@EnabledIfEnvironmentVariable(named = "INTEGRATIONTEST", matches = "enabled")
 public class AggregationControllerTest {
     @Autowired
     private AggregationController aggregationController;
