@@ -1,4 +1,4 @@
-# Csaba Kavai TNT Assignment
+# Himadri Csaba Kavai TNT Assignment
 
 ## Prerequisites
 * OpenJDK 11
