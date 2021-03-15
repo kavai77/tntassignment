@@ -51,11 +51,11 @@ public class ThrottlingApiGateway implements ApiGateway {
 
     @PostConstruct
     public void scheduler() {
-        Flux<Long> schedulerBackPressureMono = Flux.create(sink -> {
+        Flux<Long> schedulerPushMono = Flux.create(sink -> {
             this.schedulerPushSink = sink;
         });
         Flux.interval(Duration.ofSeconds(1))
-            .mergeWith(schedulerBackPressureMono)
+            .mergeWith(schedulerPushMono)
             .doOnNext(tick -> {
                 LOGGER.debug("tick {}", tick);
                 List<Mono<? extends ApiResponse>> monoList = new ArrayList<>();
